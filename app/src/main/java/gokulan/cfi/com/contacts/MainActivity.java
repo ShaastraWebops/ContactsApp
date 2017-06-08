@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,13 +24,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         String result = "initial";
-        String url = "https://docs.google.com/spreadsheets/d/1DOGxIrinXLGfsIgj27x-JsOZydNY8GXpSlzZoTiEmYo/pub?output=tsv";
+        String url = "https://docs.google.com/spreadsheets/d/1aTRfgVXj_vj1pwxHLzkArx4ibRc2ayOwI1Q5ajkKXnM/pub?output=tsv";
+        //String url = "https://docs.google.com/spreadsheets/d/1DOGxIrinXLGfsIgj27x-JsOZydNY8GXpSlzZoTiEmYo/pub?output=tsv";
         try {
             result = new HttpGetRequest().execute(url).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             result = "null";
         }
+
+
+        if(result == null){
+            Log.i("RESULTNULL","prob no internet");
+            Toast.makeText(this, "No internet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.i("Result",result);
+
 
         OutputStreamWriter oStreamWriter = null;
         try {
