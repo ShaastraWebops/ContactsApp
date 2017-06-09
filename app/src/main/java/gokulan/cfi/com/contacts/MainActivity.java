@@ -124,6 +124,30 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = db2.query(CoreContract.CoreEntry.TABLE_NAME, null, null, null, null, null, null);
         Toast.makeText(this, "No internet, found "+cursor.getCount()+" contacts in cache", Toast.LENGTH_SHORT).show();
 
+        while(cursor.moveToNext()){
+            // Create a core
+            Core c = new Core(cursor.getString(cursor.getColumnIndex(CoreContract.CoreEntry.COLUMN_NAME_CORE_NAME)),
+                    cursor.getString(cursor.getColumnIndex(CoreContract.CoreEntry.COLUMN_NAME_ROLL_NUM)),
+                    cursor.getString(cursor.getColumnIndex(CoreContract.CoreEntry.COLUMN_NAME_DEPT)));
+
+            // Get all the phone numbers
+            String phones = cursor.getString(cursor.getColumnIndex(CoreContract.CoreEntry.COLUMN_NAME_PHONES));
+            String[] allphones = phones.split(",");
+            for(int i=0;i<allphones.length;i++){
+                c.addPhone(allphones[i].trim());
+            }
+
+            // Get all the emails
+            String emails = cursor.getString(cursor.getColumnIndex(CoreContract.CoreEntry.COLUMN_NAME_EMAILS));
+            String[] allemails = emails.split(",");
+            for(int i=0;i<allemails.length;i++){
+                c.addPhone(allemails[i].trim());
+            }
+
+            // Add the core to the arraylist
+            cores.add(c);
+        }
+
     }
 
     private void addCoresToLocal(ArrayList<Core> cores) {
@@ -135,10 +159,12 @@ public class MainActivity extends AppCompatActivity {
             Core c = cores.get(i);
             ContentValues coreEntry = new ContentValues();
 
+            // Add the name, rollnum and department
             coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_CORE_NAME,c.getName());
             coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_ROLL_NUM,c.getRollNum());
             coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_DEPT,c.getDepartment());
 
+            // Store all the phone numbers as one comma separated string
             ArrayList<String> phones = c.getPhones();
             String allPhones = phones.get(0);
             for(int j=1;j<phones.size();j++){
@@ -146,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
             }
             coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_PHONES, allPhones);
 
+            // Store all the emails as one comma separated string
             ArrayList<String> emails = c.getEmails();
             String allEmails = emails.get(0);
             for(int j=1;j<emails.size();j++){
@@ -153,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             }
             coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_EMAILS, allEmails);
 
-
+            // Add the entry to the database
             db.insert(CoreContract.CoreEntry.TABLE_NAME, null, coreEntry);
         }
 
