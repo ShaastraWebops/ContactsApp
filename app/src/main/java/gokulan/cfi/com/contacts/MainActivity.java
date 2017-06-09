@@ -1,5 +1,8 @@
 package gokulan.cfi.com.contacts;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +19,9 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+
+import gokulan.cfi.com.contacts.LocalDB.CoreContract;
+import gokulan.cfi.com.contacts.LocalDB.CoreDbHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -113,11 +119,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readCoresFromLocal(ArrayList<Core> cores) {
-        Toast.makeText(this, "No internet, using cached data", Toast.LENGTH_SHORT).show();
-        return;
+        CoreDbHelper coreDbHelper = new CoreDbHelper(this);
+        SQLiteDatabase db2 = coreDbHelper.getReadableDatabase();
+        Cursor cursor = db2.query(CoreContract.CoreEntry.TABLE_NAME, null, null, null, null, null, null);
+        Toast.makeText(this, "No internet, found "+cursor.getCount()+" contacts in cache", Toast.LENGTH_SHORT).show();
+
     }
 
     private void addCoresToLocal(ArrayList<Core> cores) {
+        CoreDbHelper coreDbHelper = new CoreDbHelper(this);
+        SQLiteDatabase db = coreDbHelper.getWritableDatabase();
+        coreDbHelper.onUpgrade(db,0,1);
 
+        for(int i=0;i<cores.size();i++){
+            Core c = cores.get(i);
+            ContentValues coreEntry = new ContentValues();
+
+            coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_CORE_NAME,c.getName());
+            coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_ROLL_NUM,c.getRollNum());
+            coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_DEPT,c.getDepartment());
+
+            ArrayList<String> phones = c.getPhones();
+            String allPhones = phones.get(0);
+            for(int j=1;j<phones.size();j++){
+                allPhones+=","+phones.get(j);
+            }
+            coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_PHONES, allPhones);
+
+            ArrayList<String> emails = c.getEmails();
+            String allEmails = emails.get(0);
+            for(int j=1;j<emails.size();j++){
+                allEmails+=","+emails.get(j);
+            }
+            coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_EMAILS, allEmails);
+
+
+            db.insert(CoreContract.CoreEntry.TABLE_NAME, null, coreEntry);
+        }
+
+        SQLiteDatabase db2 = coreDbHelper.getReadableDatabase();
+        Cursor cursor = db2.query(CoreContract.CoreEntry.TABLE_NAME, null, null, null, null, null, null);
+        Toast.makeText(this, "Stored "+cursor.getCount()+" contacts in cache", Toast.LENGTH_SHORT).show();
     }
 }
