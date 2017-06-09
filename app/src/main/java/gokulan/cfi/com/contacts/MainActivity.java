@@ -34,15 +34,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        if(result == null){
-            Log.i("RESULTNULL","prob no internet");
-            Toast.makeText(this, "No internet", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Log.i("Result",result);
-
-
         OutputStreamWriter oStreamWriter = null;
         try {
             oStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput("index.txt", getApplicationContext().MODE_PRIVATE));
@@ -51,56 +42,60 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ArrayList<Core> cores = new ArrayList<>();
-        String[] people = result.split("\n");
-        String dept = "";
-        Core core;
-        for(int i=1; i<people.length; i++)
-        {
-            String line = people[i];
-            //Log.d("line", line.trim())
-            String[] vals = line.split("\t");
-            if(vals.length!=0)
-            {
-                if(!line.startsWith("\t"))
-                {
-                    core = new Core(vals[1], vals[2], vals[0]);
-                    dept = vals[0];
-                    String p = vals[5];
-                    String ps[] = p.split(",");
-                    for(int j=0; j<ps.length; j++)
-                    {
-                        core.addPhone(ps[j].trim());
+        if(result != null){
+            Log.i("Result",result);
+            String[] people = result.split("\n");
+            String dept = "";
+            Core core;
+            for(int i=1; i<people.length; i++) {
+                String line = people[i];
+                //Log.d("line", line.trim())
+                String[] vals = line.split("\t");
+                if (vals.length != 0) {
+                    if (!line.startsWith("\t")) {
+                        core = new Core(vals[1], vals[2], vals[0]);
+                        dept = vals[0];
+                        String p = vals[5];
+                        String ps[] = p.split(",");
+                        for (int j = 0; j < ps.length; j++) {
+                            core.addPhone(ps[j].trim());
+                        }
+                        p = vals[6];
+                        ps = p.split(",");
+                        for (int j = 0; j < ps.length; j++) {
+                            core.addEmail(ps[j].trim());
+                        }
+                    } else {
+                        core = new Core(vals[1], vals[2], dept);
+                        String p = vals[5];
+                        String ps[] = p.split(",");
+                        for (int j = 0; j < ps.length; j++) {
+                            core.addPhone(ps[j].trim());
+                        }
+                        p = vals[6];
+                        ps = p.split(",");
+                        for (int j = 0; j < ps.length; j++) {
+                            core.addEmail(ps[j].trim());
+                        }
                     }
-                    p = vals[6];
-                    ps = p.split(",");
-                    for(int j=0; j<ps.length; j++) {
-                        core.addEmail(ps[j].trim());
+                    cores.add(core);
+                    Log.e("DETAILS", core.getData());
+                    try {
+                        oStreamWriter.write(core.getData() + "\n");
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                }
-                else
-                {
-                    core = new Core(vals[1], vals[2], dept);
-                    String p = vals[5];
-                    String ps[] = p.split(",");
-                    for(int j=0; j<ps.length; j++)
-                    {
-                        core.addPhone(ps[j].trim());
-                    }
-                    p = vals[6];
-                    ps = p.split(",");
-                    for(int j=0; j<ps.length; j++) {
-                        core.addEmail(ps[j].trim());
-                    }
-                }
-                cores.add(core);
-                Log.e("DETAILS", core.getData());
-                try {
-                    oStreamWriter.write(core.getData()+"\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
+
+            addCoresToLocal(cores);
+
+        }else{
+            readCoresFromLocal(cores);
         }
+
+
+
         try {
             oStreamWriter.close();
         } catch (IOException e) {
@@ -114,6 +109,15 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+
+    }
+
+    private void readCoresFromLocal(ArrayList<Core> cores) {
+        Toast.makeText(this, "No internet, using cached data", Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    private void addCoresToLocal(ArrayList<Core> cores) {
 
     }
 }
