@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        Log.i("testingresources",getString(R.string.SHEETS_API_KEY));
+
+
         OutputStreamWriter oStreamWriter = null;
         try {
             oStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput("index.txt", getApplicationContext().MODE_PRIVATE));
