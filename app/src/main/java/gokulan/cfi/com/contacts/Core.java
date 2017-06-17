@@ -1,12 +1,13 @@
 package gokulan.cfi.com.contacts;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by gokulan on 4/18/17.
  */
 
-public class Core {
+public class Core implements Serializable{
     private String name, roll_num, department;
     private ArrayList<String> emails;
     private ArrayList<String> phones;

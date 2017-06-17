@@ -24,53 +24,28 @@ public class ContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
 
-        String name = getIntent().getStringExtra("name");
-        Log.d("NAME", name);
-        String line = "";
+        Core c = (Core) getIntent().getSerializableExtra("coreObject");
 
-        try {
-            InputStream iStream = openFileInput("index.txt");
-            InputStreamReader reader = new InputStreamReader(iStream);
-            BufferedReader bufferedReader = new BufferedReader(reader);
-
-            Boolean found = false;
-            while(!found && ((line = bufferedReader.readLine()) != null))
-            {
-                Log.d("LINE", line);
-                if(line.startsWith(name))
-                {
-                    found = true;
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Log.e("Line", line);
-        String[] vals = line.split(",");
 
         TextView name_view = (TextView) findViewById(R.id.name_view);
         TextView dept_view = (TextView) findViewById(R.id.dept_view);
-        name_view.setText(vals[0]);
-        dept_view.setText(vals[2]);
-
-        String emails = vals[4];
-        String phones = vals[3];
+        name_view.setText(c.getName());
+        dept_view.setText(c.getDepartment());
 
         ArrayList<String> contacts = new ArrayList<>();
-        String[] vals1 = emails.split("#");
+        ArrayList<String> vals1 = c.getEmails();
 
-        for(int i=0; i < vals1.length; i++)
+        for(int i=0; i < vals1.size(); i++)
         {
-            contacts.add(vals1[i]);
+            contacts.add(vals1.get(i));
         }
-        String[] vals2 = phones.split("#");
+        ArrayList<String> vals2 = c.getPhones();
         Log.e("cSize", String.valueOf(contacts.size()));
-        Log.d("size", String.valueOf(vals2.length));
-        Log.d("val", vals2[0]);
-        for(int i=0; i<vals2.length; i++)
+        Log.d("size", String.valueOf(vals2.size()));
+        Log.d("val", vals2.get(0));
+        for(int i=0; i<vals2.size(); i++)
         {
-            contacts.add(vals2[i]);
+            contacts.add(vals2.get(i));
         }
         Log.d("Count", String.valueOf(contacts.size()));
 

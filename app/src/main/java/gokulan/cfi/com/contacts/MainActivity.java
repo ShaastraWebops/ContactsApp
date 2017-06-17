@@ -11,6 +11,10 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -30,8 +34,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         String result = "initial";
+        final String API_KEY = getString(R.string.SHEETS_API_KEY);
+        final String SPREADSHEET_ID = "1_cY0ak-Q7XpB3X5tV9xtZMeOp5hIZsySwRXDCEzz6dY";
         //String url = "https://docs.google.com/spreadsheets/d/1aTRfgVXj_vj1pwxHLzkArx4ibRc2ayOwI1Q5ajkKXnM/pub?output=tsv"; //TESTING URL
-        String url = "https://docs.google.com/spreadsheets/d/1DOGxIrinXLGfsIgj27x-JsOZydNY8GXpSlzZoTiEmYo/pub?output=tsv";
+        //String url = "https://docs.google.com/spreadsheets/d/1DOGxIrinXLGfsIgj27x-JsOZydNY8GXpSlzZoTiEmYo/pub?output=tsv";
+        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/CoCAS&Cores!A2:G100?key="+API_KEY;
         try {
             result = new HttpGetRequest().execute(url).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -40,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        Log.i("testingresources",getString(R.string.SHEETS_API_KEY));
+        Log.i("testingresources", API_KEY);
 
 
         OutputStreamWriter oStreamWriter = null;
@@ -53,50 +60,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Core> cores = new ArrayList<>();
         if(result != null){
             Log.i("Result",result);
-            String[] people = result.split("\n");
-            String dept = "";
-            Core core;
-            for(int i=1; i<people.length; i++) {
-                String line = people[i];
-                //Log.d("line", line.trim())
-                String[] vals = line.split("\t");
-                if (vals.length != 0) {
-                    if (!line.startsWith("\t")) {
-                        core = new Core(vals[1], vals[2], vals[0]);
-                        dept = vals[0];
-                        String p = vals[5];
-                        String ps[] = p.split(",");
-                        for (int j = 0; j < ps.length; j++) {
-                            core.addPhone(ps[j].trim());
-                        }
-                        p = vals[6];
-                        ps = p.split(",");
-                        for (int j = 0; j < ps.length; j++) {
-                            core.addEmail(ps[j].trim());
-                        }
-                    } else {
-                        core = new Core(vals[1], vals[2], dept);
-                        String p = vals[5];
-                        String ps[] = p.split(",");
-                        for (int j = 0; j < ps.length; j++) {
-                            core.addPhone(ps[j].trim());
-                        }
-                        p = vals[6];
-                        ps = p.split(",");
-                        for (int j = 0; j < ps.length; j++) {
-                            core.addEmail(ps[j].trim());
-                        }
-                    }
-                    cores.add(core);
-                    Log.e("DETAILS", core.getData());
-                    try {
-                        oStreamWriter.write(core.getData() + "\n");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
 
+            parseCores(cores,result);
             addCoresToLocal(cores);
 
         }else{
@@ -118,6 +83,46 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+
+    }
+
+    private void parseCores(ArrayList<Core> cores, String result) {
+
+        try {
+            JSONObject res = new JSONObject(result);
+            JSONArray vals = res.getJSONArray("values");
+            /*
+            format for an element of vals:
+            [dept-0,name-1,rollno-2,hostel-3,roomno-4,phones-5,emails-6]
+             */
+            String dept = "";
+            for(int i=0;i<vals.length();i++){
+                JSONArray corejson = vals.getJSONArray(i);
+
+                if(corejson.length()==0)continue;
+
+                // Check if same dept or new dept for the next core
+                if(!corejson.getString(0).equals(""))dept = corejson.getString(0);
+
+                Core c = new Core(corejson.getString(1),corejson.getString(2),dept);
+
+                String phones = corejson.getString(5);
+                String[] allphones = phones.split(",");
+                for(int j=0;j<allphones.length;j++){
+                    c.addPhone(allphones[j].trim());
+                }
+
+                String emails = corejson.getString(6);
+                String[] allemails = emails.split(",");
+                for(int j=0;j<allemails.length;j++){
+                    c.addEmail(allemails[j].trim());
+                }
+
+                cores.add(c);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             String emails = cursor.getString(cursor.getColumnIndex(CoreContract.CoreEntry.COLUMN_NAME_EMAILS));
             String[] allemails = emails.split(",");
             for(int i=0;i<allemails.length;i++){
-                c.addPhone(allemails[i].trim());
+                c.addEmail(allemails[i].trim());
             }
 
             // Add the core to the arraylist

@@ -36,6 +36,7 @@ public class CoreAdapter extends RecyclerView.Adapter<CoreAdapter.viewHolder>{
         Core e = coreList.get(position);
         holder.name_view.setText(e.getName());
         holder.id_view.setText(e.getDepartment());
+        holder.position=position;
     }
 
     public int getItemCount()
@@ -44,6 +45,7 @@ public class CoreAdapter extends RecyclerView.Adapter<CoreAdapter.viewHolder>{
     public class viewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         public TextView name_view, id_view;
+        public int position=-1;
         public viewHolder(View view)
         {
             super(view);
@@ -54,8 +56,9 @@ public class CoreAdapter extends RecyclerView.Adapter<CoreAdapter.viewHolder>{
         @Override
         public void onClick(View view) {
             Intent intent = new Intent(context, ContactActivity.class);
-            intent.putExtra("name", name_view.getText());
+            intent.putExtra("coreObject", coreList.get(position));
             context.startActivity(intent);
+            Log.i("Position",position+"");
         }
     }
 
