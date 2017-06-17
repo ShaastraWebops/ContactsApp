@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<<<<<<< HEAD
     <string name="SHEETS_API_KEY">AIzaSyBYiDs_KrX-u_l788lqCV4jn1CO6v9rdLQ</string>
+=======
+    <string name="SHEETS_API_KEY">your_api_key_here</string>
+>>>>>>> 5b8fbc877d55f88708c636c6bb2c9febec71498e
 </resources>
