@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/cores"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="COCAS&amp;Cores" />
+        <item
+            android:id="@+id/candd"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Concept and Design" />
+        <item
+            android:id="@+id/envisage"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Envisage" />
+        <item
+            android:id="@+id/events"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Events" />
+        <item
+            android:id="@+id/evolve"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Evolve" />
+        <item
+            android:id="@+id/ict"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="ICT" />
+        <item
+            android:id="@+id/finance"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Finance" />
+        <item
+            android:id="@+id/msr"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Media and Student Relations" />
+        <item
+            android:id="@+id/oip"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="OIP" />
+        <item
+            android:id="@+id/qms"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="QMS" />
+        <item
+            android:id="@+id/shows"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Shows and Exhibitions" />
+        <item
+            android:id="@+id/spons"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Sponsorship and PR" />
+        <item
+            android:id="@+id/webops"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Webops" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>
+
+</menu>
