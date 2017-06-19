@@ -77,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_viewwww);
 
         CoreAdapter adapter = new CoreAdapter(MainActivity.this, cores);
 
