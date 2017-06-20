@@ -117,7 +117,6 @@ public class HomeActivity extends AppCompatActivity
 //        newFragment.setArguments(args);
         Log.i("dept",dept);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        Toast.makeText(this, "ldaksjdlaksjd", Toast.LENGTH_SHORT).show();
         transaction.replace(R.id.fragment_container, newFragment);
         transaction.addToBackStack(null);
 

@@ -107,6 +107,8 @@ public class CoreListFragment extends Fragment {
             e.printStackTrace();
         }
 
+        CoreContract.CoreEntry.tableName=parseName(vertical);
+
         ArrayList<Core> cores = new ArrayList<>();
         if(result != null){
             Log.i("Result",result);
@@ -137,6 +139,17 @@ public class CoreListFragment extends Fragment {
         return v;
     }
 
+    private String parseName(String vertical) {
+        String parsed = "";
+        char c;
+        for(int i=0;i<vertical.length();i++){
+            c = vertical.charAt(i);
+            if(Character.isLetterOrDigit(c)){
+                parsed+=c;
+            }
+        }
+        return parsed;
+    }
 
 
     @Override
@@ -214,7 +227,13 @@ public class CoreListFragment extends Fragment {
     private void readCoresFromLocal(ArrayList<Core> cores) {
         CoreDbHelper coreDbHelper = new CoreDbHelper(this.getContext());
         SQLiteDatabase db2 = coreDbHelper.getReadableDatabase();
-        Cursor cursor = db2.query(CoreContract.CoreEntry.TABLE_NAME, null, null, null, null, null, null);
+        Cursor cc = db2.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
+                + CoreContract.CoreEntry.tableName + "'", null);
+        if(cc.getCount()==0){
+            Toast.makeText(this.getContext(), "No internet, found "+cc.getCount()+" contacts in cache", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Cursor cursor = db2.query(CoreContract.CoreEntry.tableName, null, null, null, null, null, null);
         Toast.makeText(this.getContext(), "No internet, found "+cursor.getCount()+" contacts in cache", Toast.LENGTH_SHORT).show();
 
         while(cursor.moveToNext()){
@@ -274,11 +293,11 @@ public class CoreListFragment extends Fragment {
             coreEntry.put(CoreContract.CoreEntry.COLUMN_NAME_EMAILS, allEmails);
 
             // Add the entry to the database
-            db.insert(CoreContract.CoreEntry.TABLE_NAME, null, coreEntry);
+            db.insert(CoreContract.CoreEntry.tableName, null, coreEntry);
         }
 
         SQLiteDatabase db2 = coreDbHelper.getReadableDatabase();
-        Cursor cursor = db2.query(CoreContract.CoreEntry.TABLE_NAME, null, null, null, null, null, null);
+        Cursor cursor = db2.query(CoreContract.CoreEntry.tableName, null, null, null, null, null, null);
         Toast.makeText(this.getContext(), "Stored "+cursor.getCount()+" contacts in cache", Toast.LENGTH_SHORT).show();
     }
 }

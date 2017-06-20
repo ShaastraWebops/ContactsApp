@@ -11,7 +11,7 @@ public final class CoreContract {
     private void CoreContract(){}
 
     public static class CoreEntry implements BaseColumns {
-        public static final String TABLE_NAME = "cores";
+        public static String tableName = "cores";
         public static final String COLUMN_NAME_CORE_NAME = "coreName";
         public static final String COLUMN_NAME_ROLL_NUM = "rollNum";
         public static final String COLUMN_NAME_DEPT = "dept";
