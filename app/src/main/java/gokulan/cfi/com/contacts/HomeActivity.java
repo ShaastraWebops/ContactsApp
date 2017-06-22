@@ -82,6 +82,11 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        //Toast.makeText(this, "Start", Toast.LENGTH_SHORT).show();
+        Log.i("timing","start");
         int id = item.getItemId();
         String dept = "";
         if(id == R.id.cores)
@@ -115,15 +120,13 @@ public class HomeActivity extends AppCompatActivity
 //        Bundle args = new Bundle();
 //        args.putString(CoreListFragment.ARG_VERTICAL, dept);
 //        newFragment.setArguments(args);
-        Log.i("dept",dept);
+        Log.i("timing",dept);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, newFragment);
         transaction.addToBackStack(null);
-
         transaction.commit();
+        Log.i("timing","commited");
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 }

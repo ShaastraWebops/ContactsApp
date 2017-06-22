@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -37,13 +38,14 @@ import gokulan.cfi.com.contacts.LocalDB.CoreDbHelper;
  * Use the {@link CoreListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CoreListFragment extends Fragment {
+public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_VERTICAL = "vertical";
 
     private String vertical;
 
     private OnFragmentInteractionListener mListener;
+    private RecyclerView recyclerView;
 
     public CoreListFragment() {
         // Required empty public constructor
@@ -83,58 +85,22 @@ public class CoreListFragment extends Fragment {
             Log.i("gotvertical",vertical);
         }
 
-        String result = "initial";
+
+        ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.main_progressBar);
+
         final String API_KEY = getString(R.string.SHEETS_API_KEY);
         final String SPREADSHEET_ID = "1_cY0ak-Q7XpB3X5tV9xtZMeOp5hIZsySwRXDCEzz6dY";
         //String url = "https://docs.google.com/spreadsheets/d/1aTRfgVXj_vj1pwxHLzkArx4ibRc2ayOwI1Q5ajkKXnM/pub?output=tsv"; //TESTING URL
         //String url = "https://docs.google.com/spreadsheets/d/1DOGxIrinXLGfsIgj27x-JsOZydNY8GXpSlzZoTiEmYo/pub?output=tsv";
         String url = "https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/"+vertical+"!A2:G100?key="+API_KEY;
-        try {
-            result = new HttpGetRequest().execute(url).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            result = "null";
-        }
+        new HttpGetRequest(pb, this).execute(url);
 
 
         Log.i("testingresources", API_KEY);
 
+        recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
 
-        OutputStreamWriter oStreamWriter = null;
-        try {
-            oStreamWriter = new OutputStreamWriter(getActivity().getApplicationContext().openFileOutput("index.txt", getActivity().getApplicationContext().MODE_PRIVATE));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        CoreContract.CoreEntry.tableName=parseName(vertical);
-
-        ArrayList<Core> cores = new ArrayList<>();
-        if(result != null){
-            Log.i("Result",result);
-
-            parseCores(cores,result);
-            addCoresToLocal(cores);
-
-        }else{
-            readCoresFromLocal(cores);
-        }
-
-
-
-        try {
-            oStreamWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
-
-        CoreAdapter adapter = new CoreAdapter(getActivity(), cores);
-
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        //Toast.makeText(getActivity(), "TEST", Toast.LENGTH_SHORT).show();
 
         return v;
     }
@@ -167,6 +133,30 @@ public class CoreListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void executeDoneCallback(String result) {
+        CoreContract.CoreEntry.tableName=parseName(vertical);
+
+        ArrayList<Core> cores = new ArrayList<>();
+        if(result != null){
+            Log.i("Result",result);
+
+            parseCores(cores,result);
+            addCoresToLocal(cores);
+
+        }else{
+            readCoresFromLocal(cores);
+        }
+
+        
+
+        CoreAdapter adapter = new CoreAdapter(getActivity(), cores);
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
     }
 
     /**

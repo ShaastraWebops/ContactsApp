@@ -17,6 +17,20 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent" />
 
+
+    <RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+        <ProgressBar
+            android:id="@+id/main_progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"

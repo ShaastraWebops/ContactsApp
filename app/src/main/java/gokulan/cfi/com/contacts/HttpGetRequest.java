@@ -1,6 +1,9 @@
 package gokulan.cfi.com.contacts;
 
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -16,6 +19,19 @@ public class HttpGetRequest extends AsyncTask<String, Void, String> {
     public static final String REQ_METHOD = "GET";
     public static final int REQ_TIMEOUT = 15000;
     public static final int CONN_TIMEOUT = 15000;
+    private ProgressBar pb;
+    private ExecuteDoneCallback exb;
+
+    public HttpGetRequest(ProgressBar mpb, ExecuteDoneCallback ex){
+        pb = mpb;
+        exb = ex;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        pb.setVisibility(View.VISIBLE);
+    }
 
     @Override
     protected String doInBackground(String... strings) {
@@ -58,6 +74,8 @@ public class HttpGetRequest extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result)
     {
         super.onPostExecute(result);
+        pb.setVisibility(View.GONE);
+        exb.executeDoneCallback(result);
         return;
     }
 }
