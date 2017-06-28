@@ -64,4 +64,13 @@ public class Core implements Serializable{
         return name+","+roll_num+","+department+","+getStringPhones()+","+getStringEmails();
     }
 
+    /**
+     * Checks if this core and the other core have the same name, department and roll number.
+     * @param other
+     * @return
+     */
+    public boolean isSame(Core other){
+        return name.equals(other.getName()) && department.equals(other.getDepartment()) && roll_num.equals(other.getRollNum());
+    }
+
 }

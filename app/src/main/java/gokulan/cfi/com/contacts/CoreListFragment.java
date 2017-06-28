@@ -46,6 +46,7 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
 
     private OnFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
+    private CoreAdapter adapter;
 
     public CoreListFragment() {
         // Required empty public constructor
@@ -58,7 +59,6 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
      * @param vvertical Vertical of the contacts.
      * @return A new instance of fragment CoreListFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static CoreListFragment newInstance(String vvertical) {
         CoreListFragment fragment = new CoreListFragment();
         Bundle args = new Bundle();
@@ -85,20 +85,38 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
             Log.i("gotvertical",vertical);
         }
 
+        if(vertical==HomeActivity.FAVORITES_NAME){
+            CoreContract.CoreEntry.tableName=parseName(vertical);
 
-        ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.main_progressBar);
+//            ArrayList<Core> cores = HomeActivity.favorites;
 
-        final String API_KEY = getString(R.string.SHEETS_API_KEY);
-        final String SPREADSHEET_ID = "1_cY0ak-Q7XpB3X5tV9xtZMeOp5hIZsySwRXDCEzz6dY";
-        //String url = "https://docs.google.com/spreadsheets/d/1aTRfgVXj_vj1pwxHLzkArx4ibRc2ayOwI1Q5ajkKXnM/pub?output=tsv"; //TESTING URL
-        //String url = "https://docs.google.com/spreadsheets/d/1DOGxIrinXLGfsIgj27x-JsOZydNY8GXpSlzZoTiEmYo/pub?output=tsv";
-        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/"+vertical+"!A2:G100?key="+API_KEY;
-        new HttpGetRequest(pb, this).execute(url);
+            readCoresFromLocal(HomeActivity.favorites);
+
+            adapter = new CoreAdapter(getActivity(), HomeActivity.favorites);
+
+            recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
+        }else{
+            ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.main_progressBar);
+
+            final String API_KEY = getString(R.string.SHEETS_API_KEY);
+            final String SPREADSHEET_ID = "1_cY0ak-Q7XpB3X5tV9xtZMeOp5hIZsySwRXDCEzz6dY";
+            //String url = "https://docs.google.com/spreadsheets/d/1aTRfgVXj_vj1pwxHLzkArx4ibRc2ayOwI1Q5ajkKXnM/pub?output=tsv"; //TESTING URL
+            //String url = "https://docs.google.com/spreadsheets/d/1DOGxIrinXLGfsIgj27x-JsOZydNY8GXpSlzZoTiEmYo/pub?output=tsv";
+            String url = "https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/"+vertical+"!A2:G100?key="+API_KEY;
+            new HttpGetRequest(pb, this).execute(url);
 
 
-        Log.i("testingresources", API_KEY);
+            Log.i("testingresources", API_KEY);
 
-        recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
+            recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
+
+
+        }
+
+
 
         //Toast.makeText(getActivity(), "TEST", Toast.LENGTH_SHORT).show();
 
@@ -130,10 +148,21 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
     }
 
     @Override
+    public void onResume(){
+        super.onResume();
+        refreshAdapter();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
+
+    public void refreshAdapter(){
+        if(adapter!=null)adapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public void executeDoneCallback(String result) {
@@ -152,12 +181,12 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
 
         
 
-        CoreAdapter adapter = new CoreAdapter(getActivity(), cores);
-
+        adapter = new CoreAdapter(getActivity(), cores);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
     }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -215,6 +244,7 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
     }
 
     private void readCoresFromLocal(ArrayList<Core> cores) {
+        cores.clear();
         CoreDbHelper coreDbHelper = new CoreDbHelper(this.getContext());
         SQLiteDatabase db2 = coreDbHelper.getReadableDatabase();
         Cursor cc = db2.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"

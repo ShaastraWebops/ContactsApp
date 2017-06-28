@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
@@ -17,8 +18,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, CoreListFragment.OnFragmentInteractionListener {
+
+
+    public static ArrayList<Core> favorites = new ArrayList<Core>();
+    public static String FAVORITES_NAME = "FAVORITES";
+    private CoreListFragment newFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +98,8 @@ public class HomeActivity extends AppCompatActivity
         Log.i("timing","start");
         int id = item.getItemId();
         String dept = "";
+        if(id==R.id.favorites)
+            dept=FAVORITES_NAME;
         if(id == R.id.cores)
             dept = "COCAS&Cores";
         if(id == R.id.candd)
@@ -116,16 +127,19 @@ public class HomeActivity extends AppCompatActivity
         else if(id == R.id.webops)
             dept = "Webops";
 
-        CoreListFragment newFragment = CoreListFragment.newInstance(dept);
+        newFragment = CoreListFragment.newInstance(dept);
 //        Bundle args = new Bundle();
 //        args.putString(CoreListFragment.ARG_VERTICAL, dept);
 //        newFragment.setArguments(args);
+
         Log.i("timing",dept);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, newFragment);
         transaction.addToBackStack(null);
         transaction.commit();
         Log.i("timing","commited");
+
+
 
         return true;
     }
