@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -47,6 +48,7 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
     private OnFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
     private CoreAdapter adapter;
+    private TextView noFavTV;
 
     public CoreListFragment() {
         // Required empty public constructor
@@ -93,6 +95,8 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
             readCoresFromLocal(HomeActivity.favorites);
 
             adapter = new CoreAdapter(getActivity(), HomeActivity.favorites);
+            noFavTV = (TextView) v.findViewById(R.id.noFavTV);
+            checkNoFavs();
 
             recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -151,6 +155,21 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
     public void onResume(){
         super.onResume();
         refreshAdapter();
+        checkNoFavs();
+    }
+
+    private void checkNoFavs() {
+        if(noFavTV==null){
+            Log.i("NullPointer","noFavTV");
+            return;
+        }
+        if(HomeActivity.favorites.size()==0){
+            Log.i("Visible","noFavTV");
+            noFavTV.setVisibility(View.VISIBLE);
+        }else {
+            Log.i("Gone","noFavTV");
+            noFavTV.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -250,11 +269,19 @@ public class CoreListFragment extends Fragment implements ExecuteDoneCallback {
         Cursor cc = db2.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
                 + CoreContract.CoreEntry.tableName + "'", null);
         if(cc.getCount()==0){
-            Toast.makeText(this.getContext(), "No internet, found "+cc.getCount()+" contacts in cache", Toast.LENGTH_SHORT).show();
+            if(CoreContract.CoreEntry.tableName.equals(HomeActivity.FAVORITES_NAME)){
+                Toast.makeText(this.getContext(), "No favorites found", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Toast.makeText(this.getContext(), "No internet, found 0 contacts in cache", Toast.LENGTH_SHORT).show();
             return;
         }
         Cursor cursor = db2.query(CoreContract.CoreEntry.tableName, null, null, null, null, null, null);
-        Toast.makeText(this.getContext(), "No internet, found "+cursor.getCount()+" contacts in cache", Toast.LENGTH_SHORT).show();
+
+        if(CoreContract.CoreEntry.tableName.equals(HomeActivity.FAVORITES_NAME))
+            Toast.makeText(this.getContext(), "Found "+cursor.getCount()+" favorites", Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(this.getContext(), "No internet, found "+cursor.getCount()+" contacts in cache", Toast.LENGTH_SHORT).show();
 
         while(cursor.moveToNext()){
             // Create a core

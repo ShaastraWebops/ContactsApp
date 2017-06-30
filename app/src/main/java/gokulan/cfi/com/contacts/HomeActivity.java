@@ -24,6 +24,7 @@ public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, CoreListFragment.OnFragmentInteractionListener {
 
 
+    private static final int FAVORITES_INDEX = 0;
     public static ArrayList<Core> favorites = new ArrayList<Core>();
     public static String FAVORITES_NAME = "FAVORITES";
     private CoreListFragment newFragment;
@@ -53,6 +54,8 @@ public class HomeActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        MenuItem item = navigationView.getMenu().getItem(FAVORITES_INDEX);
+        onNavigationItemSelected(item);
     }
 
     @Override

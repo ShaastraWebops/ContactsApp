@@ -4,10 +4,29 @@
     android:layout_height="match_parent"
     tools:context="gokulan.cfi.com.contacts.CoreListFragment">
 
-    <android.support.v7.widget.RecyclerView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/recycler_view"
-        android:paddingTop="60dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/recycler_view"
+            android:paddingTop="60dp"/>
+
+        <TextView
+            android:text="You don't have any favorites!"
+            android:gravity="center_horizontal"
+            android:textSize="25dp"
+            android:padding="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/noFavTV"
+            android:visibility="gone"/>
+
+
+    </LinearLayout>
 
 </FrameLayout>
